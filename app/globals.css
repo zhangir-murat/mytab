@@ -35,3 +35,17 @@
 @media(min-width:1000px){.motion-debug{left:24px;top:120px;width:280px}}
 @media(max-height:740px){.resin-text .marker-number{font-size:38px}.resin-text .marker-name{font-size:25px}.resin-text .marker-qty{font-size:72px}.resin-text .marker-content{gap:6px}.resin-text .marker{padding:12px 20px}.resin-instruction{font-size:13px;top:calc(50% - 100px)}.motion-debug pre{font-size:9px;line-height:1.5}}
 @media(prefers-reduced-motion:reduce){.resin-coming .resin-svg{animation:none}.resin-instruction{transition:none}}
+
+/* Live marker: reserve a compact safe-area-aware header above the resin bounds. */
+.app:has(.smart-live) .topbar{height:calc(50px + env(safe-area-inset-top));flex:0 0 calc(50px + env(safe-area-inset-top));padding:env(safe-area-inset-top) 18px 0;margin:0 auto}
+.app:has(.smart-live) .wordmark{font-size:23px;letter-spacing:-1.5px;min-height:44px}
+.app:has(.smart-live) .logo-dot{font-size:6px;margin:3px 0 0 4px}
+.app:has(.smart-live) .tab-nav{padding:8px 13px;min-height:40px;font-size:11px;background:transparent;border-color:transparent}
+.app:has(.smart-live) .demo-trigger{position:fixed;bottom:max(12px,env(safe-area-inset-bottom));left:max(20px,calc(50% - 232px));z-index:40;color:#777781}
+.resin-stage{top:calc(58px + env(safe-area-inset-top));bottom:calc(120px + env(safe-area-inset-bottom));overflow:hidden}
+.resin-instruction{left:0;right:0;top:calc(50% - 88px);transition:opacity .12s ease}
+.resin-manual{left:50%;right:auto;top:50%;width:170px;height:78px;border:0;border-radius:16px;background:transparent;box-shadow:none;transform:translate(-50%,-50%);display:flex;flex-direction:column;gap:8px}
+.resin-manual:active:not(:disabled){transform:translate(-50%,-50%) scale(.97)}
+.resin-manual-icon{display:grid;place-items:center;width:56px;height:56px;flex-shrink:0;border-radius:50%;border:1px solid #57575e;background:#27272b}
+.resin-manual-label{font-size:10px;letter-spacing:1px;font-weight:650;white-space:nowrap}
+.resin-footer-row{justify-content:flex-end}

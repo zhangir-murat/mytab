@@ -7,7 +7,7 @@ test('Initial sensor data and permission do not initiate motion; real tilt scrub
  const s=createFlow();receiveTilt(s,90,0);receiveTilt(s,45,100);advance(s);assert.equal(s.flowProgress,.5);advance(s);assert.equal(s.flowProgress,.5);receiveTilt(s,40,200);advance(s);assert.ok(Math.abs(s.flowProgress-50/90)<.001);receiveTilt(s,60,300);advance(s);assert.ok(Math.abs(s.flowProgress-1/3)<.001);receiveTilt(s,0,400);advance(s);assert.equal(s.flowProgress,1);receiveTilt(s,90,500);advance(s);assert.equal(s.flowProgress,0);
 });
 test('Manual destination survives sensor noise; sustained intentional movement resumes sensors',()=>{
- const s=createFlow();receiveTilt(s,90,0);receiveTilt(s,72,100);advance(s);manualFlow(s,1);assert.equal(nextDestination(s),1);
+ const s=createFlow();receiveTilt(s,90,0);receiveTilt(s,72,100);advance(s);manualFlow(s,1);assert.equal(nextDestination(s),0);
  for(let i=0;i<200;i++){receiveTilt(s,72+Math.sin(i)*3,200+i*16);stepFlow(s,1/60)}advance(s);assert.equal(s.flowProgress,1);assert.equal(s.manual,true);assert.equal(nextDestination(s),0);
  receiveTilt(s,45,4000);receiveTilt(s,45,4100);assert.equal(s.manual,true);receiveTilt(s,45,4200);assert.equal(s.manual,false);advance(s);assert.equal(s.flowProgress,.5);
  manualFlow(s,0);advance(s);assert.equal(s.flowProgress,0);assert.equal(nextDestination(s),1);
@@ -21,4 +21,14 @@ test('Every intermediate outline is finite, bounded, connected and reversible; t
 });
 test('Endpoint hysteresis suppresses jitter without permanent locking',()=>{
  const s=createFlow();receiveTilt(s,90,0);receiveTilt(s,0,100);advance(s);for(let i=0;i<100;i++)receiveTilt(s,2+Math.sin(i),200+i*16);advance(s);assert.equal(s.flowProgress,1);receiveTilt(s,20,2000);advance(s);assert.ok(s.flowProgress<.8);
+});
+
+test('Manual resin travel completes in 300ms, reverses continuously and never overshoots',()=>{
+ const s=createFlow();
+ for(let cycle=0;cycle<8;cycle++){
+  const destination=cycle%2===0?1:0;manualFlow(s,destination);let previous=s.flowProgress;
+  for(let i=0;i<17;i++){const p=stepFlow(s,1/60);assert.ok(destination?p>=previous:p<=previous);assert.ok(p>=0&&p<=1);previous=p}
+  assert.notEqual(s.flowProgress,destination);stepFlow(s,1/60);assert.ok(Math.abs(s.flowProgress-destination)<1e-12);
+ }
+ manualFlow(s,1);stepFlow(s,.1);const middle=s.flowProgress;manualFlow(s,0);assert.equal(s.flowProgress,middle);assert.ok(stepFlow(s,1/60)<middle);advance(s);assert.equal(s.flowProgress,0);
 });

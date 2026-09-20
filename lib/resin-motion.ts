@@ -1,7 +1,7 @@
 const clamp=(n:number,lo=0,hi=1)=>Math.max(lo,Math.min(hi,n));
 export const smooth=(a:number,b:number,n:number)=>{const t=clamp((n-a)/(b-a));return t*t*(3-2*t)};
-export type FlowState={target:number;filtered:number;flowProgress:number;velocity:number;rawTilt:number|null;rawFlow:number;baseline:number|null;armed:boolean;manual:boolean;manualTarget:0|1;manualBaseline:number|null;intentSince:number|null;endpoint:0|1|null};
-export const createFlow=():FlowState=>({target:0,filtered:0,flowProgress:0,velocity:0,rawTilt:null,rawFlow:0,baseline:null,armed:false,manual:false,manualTarget:1,manualBaseline:null,intentSince:null,endpoint:0});
+export type FlowState={target:number;filtered:number;flowProgress:number;velocity:number;rawTilt:number|null;rawFlow:number;baseline:number|null;armed:boolean;manual:boolean;manualTarget:0|1;manualFrom:number;manualElapsed:number;manualBaseline:number|null;intentSince:number|null;endpoint:0|1|null};
+export const createFlow=():FlowState=>({target:0,filtered:0,flowProgress:0,velocity:0,rawTilt:null,rawFlow:0,baseline:null,armed:false,manual:false,manualTarget:1,manualFrom:0,manualElapsed:0,manualBaseline:null,intentSince:null,endpoint:0});
 export function receiveTilt(s:FlowState,degrees:number,time:number){
  if(!Number.isFinite(degrees))return;
  const tilt=clamp(degrees,0,90);s.rawTilt=tilt;s.rawFlow=1-tilt/90;
@@ -20,9 +20,17 @@ export function receiveTilt(s:FlowState,degrees:number,time:number){
  else {s.endpoint=target<.025?0:target>.975?1:null;if(s.endpoint!==null)target=s.endpoint}
  if(Math.abs(target-s.target)>.004||target===0||target===1)s.target=target;
 }
-export function manualFlow(s:FlowState,destination:0|1){s.manual=true;s.manualTarget=destination;s.manualBaseline=s.rawTilt;s.intentSince=null;s.target=destination;s.endpoint=destination}
+export function manualFlow(s:FlowState,destination:0|1){s.manual=true;s.manualTarget=destination;s.manualFrom=s.flowProgress;s.manualElapsed=0;s.manualBaseline=s.rawTilt;s.intentSince=null;s.target=destination;s.endpoint=destination}
 export function scrubFlow(s:FlowState,value:number){s.manual=false;s.intentSince=null;s.target=clamp(value);s.rawFlow=s.target;s.endpoint=null}
 export function stepFlow(s:FlowState,elapsed:number){
+ if(s.manual){
+  // The same scrubbable resin outline travels to either edge in 300 ms.
+  s.manualElapsed=Math.min(.3,s.manualElapsed+Math.max(0,elapsed));
+  const t=s.manualElapsed/.3,eased=.15*t+.85*t*t*(3-2*t);
+  s.flowProgress=s.manualFrom+(s.manualTarget-s.manualFrom)*eased;
+  s.filtered=s.flowProgress;s.velocity=0;
+  return s.flowProgress;
+ }
  const dt=Math.min(Math.max(elapsed,.001),.15),steps=Math.ceil(dt/(1/60)),h=dt/steps;
  for(let i=0;i<steps;i++){
   s.filtered+=(s.target-s.filtered)*(1-Math.exp(-h/(s.manual?.12:.075)));
@@ -32,7 +40,7 @@ export function stepFlow(s:FlowState,elapsed:number){
  if(Math.abs(s.flowProgress-s.target)<.0002&&Math.abs(s.velocity)<.002&&Math.abs(s.filtered-s.target)<.0002){s.flowProgress=s.target;s.velocity=0;s.filtered=s.target}
  return s.flowProgress;
 }
-export function nextDestination(s:FlowState):0|1 {return s.manual&&Math.abs(s.flowProgress-s.manualTarget)>.003?s.manualTarget:s.flowProgress>=.5?0:1}
+export function nextDestination(s:FlowState):0|1 {return s.manual?(s.manualTarget===1?0:1):s.flowProgress>=.5?0:1}
 // One closed, symmetrical cubic outline. No filters, droplets, moving rectangle, or raster textures.
 // Each key is [progress, top/H, bottom/H, top half-width/W, bottom half-width/W, neck half-width/W, waist/H].
 export function resinPath(progress:number,width:number,height:number,cardHeight:number){
