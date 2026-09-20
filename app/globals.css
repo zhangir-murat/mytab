@@ -49,3 +49,19 @@
 .resin-manual-icon{display:grid;place-items:center;width:56px;height:56px;flex-shrink:0;border-radius:50%;border:1px solid #57575e;background:#27272b}
 .resin-manual-label{font-size:10px;letter-spacing:1px;font-weight:650;white-space:nowrap}
 .resin-footer-row{justify-content:flex-end}
+
+/* Four facts, one fluorescent wayfinding field. The SVG supplies the sole background. */
+.resin-text .marker.live-marker{padding:23px 27px 22px;text-align:left}
+.resin-text .live-marker .marker-content{display:grid;grid-template-columns:minmax(0,1fr);grid-template-rows:60px minmax(0,1fr) 25px;justify-content:stretch;align-items:stretch;gap:0;transform:none}
+.resin-top .live-marker .marker-content{transform:rotate(180deg)}
+.live-marker-number{justify-self:end;align-self:start;font-size:clamp(40px,11.5vw,48px);line-height:.94;font-weight:900;letter-spacing:-.065em;font-variant-numeric:tabular-nums}
+.live-marker-hero{min-width:0;display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:10px;padding-bottom:5px}
+.live-marker-quantity{border:3px solid currentColor;border-radius:11px;padding:2px 8px 3px;min-width:49px;min-height:39px;display:inline-flex;align-items:center;justify-content:center;font-size:clamp(23px,7vw,29px);font-weight:850;line-height:1;letter-spacing:-.06em;white-space:nowrap;font-variant-numeric:tabular-nums}
+.live-marker-name{display:block;max-width:100%;font-size:clamp(37px,12vw,54px);font-weight:900;line-height:.98;letter-spacing:-.055em;text-transform:uppercase;text-wrap:balance;overflow-wrap:normal}
+.live-marker-name.name-medium{font-size:clamp(39px,12vw,52px)}
+.live-marker-name.name-long{font-size:clamp(28px,8.6vw,39px)}
+.live-marker-time{justify-self:center;align-self:end;font-size:18px;font-weight:650;line-height:1;letter-spacing:.01em;font-variant-numeric:tabular-nums;opacity:.67}
+.live-marker-stack{width:100%;display:flex;flex-direction:column;gap:5px;font-weight:900;text-transform:uppercase;line-height:1.01;letter-spacing:-.05em;font-size:clamp(26px,8.5vw,38px)}
+.live-marker-stack>span{display:flex;justify-content:space-between;align-items:baseline;gap:7px;text-wrap:balance}
+.live-marker-stack b{font-size:.78em;white-space:nowrap;font-variant-numeric:tabular-nums}
+@media(max-width:370px){.resin-text .marker.live-marker{padding:20px 23px 18px}.resin-text .live-marker .marker-content{grid-template-rows:54px minmax(0,1fr) 22px}.live-marker-name.name-long{font-size:clamp(25px,8vw,30px)}.live-marker-stack{font-size:clamp(24px,7.7vw,29px)}.live-marker-time{font-size:16px}}

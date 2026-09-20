@@ -4,6 +4,7 @@ import { X } from 'lucide-react';
 import { Slider } from '@/components/ui/slider';
 import { Switch } from '@/components/ui/switch';
 import { gravitySample, orientationSample } from '@/lib/marker-motion';
+import { formatElapsed } from '@/lib/elapsed';
 import { createFlow, manualFlow, nextDestination, receiveTilt, resinPath, scrubFlow, stepFlow, textVisibility } from '@/lib/resin-motion';
 
 type Permission='checking'|'prompt'|'granted'|'denied'|'unsupported';
@@ -11,7 +12,7 @@ type SensorAPI={requestPermission?:()=>Promise<string>};
 const KEY='tab-smart-display-permission';
 // Preserve the experimental sensor implementation for a later release. The live UI is manual-only.
 export const SMART_MOTION_ENABLED=false;
-export function SmartDisplay({children,orderId,status,copy,tabTotal,onTab,simulator,onSimulatorChange}:{children:ReactNode;orderId:number;status:string;copy:string;tabTotal:string;onTab:()=>void;simulator:boolean;onSimulatorChange:(enabled:boolean)=>void}){
+export function SmartDisplay({children,orderId,createdAt,status,copy,tabTotal,onTab,simulator,onSimulatorChange}:{children:ReactNode;orderId:number;createdAt:number;status:string;copy:string;tabTotal:string;onTab:()=>void;simulator:boolean;onSimulatorChange:(enabled:boolean)=>void}){
  const flow=useRef(createFlow()),stage=useRef<HTMLDivElement>(null),path=useRef<SVGPathElement>(null),svg=useRef<SVGSVGElement>(null),bottom=useRef<HTMLDivElement>(null),top=useRef<HTMLDivElement>(null),instruction=useRef<HTMLParagraphElement>(null),debug=useRef<HTMLPreElement>(null),manual=useRef<HTMLButtonElement>(null),upIcon=useRef<SVGSVGElement>(null),downIcon=useRef<SVGSVGElement>(null);
  const manualStartedAt=useRef<number|null>(null);
  const liveLabel=useRef<HTMLSpanElement>(null),lastEvent=useRef(0);const [timedOut,setTimedOut]=useState(false);
@@ -49,7 +50,7 @@ export function SmartDisplay({children,orderId,status,copy,tabTotal,onTab,simula
   return()=>{window.removeEventListener('deviceorientation',orientation);window.removeEventListener('devicemotion',motion)};
  },[permission]);
  useEffect(()=>{
-  let raf=0,last=0,lastDebug=0,width=360,height=680,card=270,lastP=-1;
+  let raf=0,last=0,lastDebug=0,lastClock=-Infinity,width=360,height=680,card=270,lastP=-1;
 
   try{if(sessionStorage.getItem(`tab-marker-instructed-${orderId}`)){instructionGone.current=true;if(instruction.current)instruction.current.style.opacity='0'}}catch{}
   const reduced=matchMedia('(prefers-reduced-motion: reduce)');
@@ -66,6 +67,7 @@ export function SmartDisplay({children,orderId,status,copy,tabTotal,onTab,simula
     const opacity=textVisibility(paint);if(bottom.current)bottom.current.style.opacity=String(opacity.bottom);if(top.current)top.current.style.opacity=String(opacity.top);
     stage.current?.setAttribute('data-flow-progress',progress.toFixed(4));stage.current?.setAttribute('data-target',s.target.toFixed(4));lastP=progress;
    }
+   if(time-lastClock>250){lastClock=time;const elapsed=formatElapsed(createdAt);stage.current?.querySelectorAll('.live-marker-time').forEach(node=>{if(node.textContent!==elapsed)node.textContent=elapsed})}
    if(!instructionGone.current&&s.target>.045){instructionGone.current=true;if(instruction.current)instruction.current.style.opacity='0';try{sessionStorage.setItem(`tab-marker-instructed-${orderId}`,'1')}catch{}}
    const next=nextDestination(s);manual.current?.setAttribute('aria-label',next?'Move order up':'Move order down');manual.current?.setAttribute('title',next?'Move order up':'Move order down');manual.current?.setAttribute('data-destination',String(next));if(upIcon.current)upIcon.current.style.display=next?'block':'none';if(downIcon.current)downIcon.current.style.display=next?'none':'block';const label=manual.current?.querySelector('.resin-manual-label');if(label)label.textContent=next?'SHOW SERVER':'BRING BACK';
    stage.current?.setAttribute('data-manual-override',String(s.manual));

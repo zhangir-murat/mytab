@@ -26,8 +26,8 @@ The production build targets Cloudflare Workers through Vinext. `pnpm start` pre
 ## Try the complete flow
 
 1. Open a tab and authorize simulated Apple Pay, Google Pay, or a demo card. Nothing is charged.
-2. Order Spicy Margarita ×2. The first round is #47 with a bright orange marker.
-3. Tap SHOW SERVER. The orange resin transfers to the top in 300 ms; tap BRING BACK to return it. Text fades out in transit and reappears already facing the correct edge.
+2. Order Spicy Margarita ×2. The first round is #47 with a fluorescent lime marker, matched in Staff Mode.
+3. Tap SHOW SERVER. The lime resin transfers to the top in 300 ms; tap BRING BACK to return it. Text fades out in transit and reappears already facing the correct edge.
 4. Use the small controls button (bottom-left on the live marker) to switch to Staff. Start the order, mark it ready, deliver it, then mark it delivered.
 5. Return to Customer and order another round. No further authorization, payment, or tip screen appears.
 6. Open the literal TAB button and choose CLOSE MY TAB after delivery. Choose 18%, 20%, 25%, Custom, or No tip; nothing is preselected.
@@ -38,6 +38,8 @@ Add to Tab assembles an unplaced round. Send Order submits its items together. L
 ## Manual resin marker
 
 Orders open directly into the bottom marker. One connected SVG path morphs from a rounded rectangle through a narrow resin neck into the opposite rectangle. Geometry is a deterministic function of `flowProgress`; the same path runs in reverse. Manual travel lasts 300 ms, uses requestAnimationFrame without per-frame React state, and can reverse from its current shape on repeated taps. Text fades away during transfer and returns at its fixed 0° or 180° orientation. Reduced motion uses the correct endpoint without the morph.
+
+The active customer marker uses a four-level wayfinding layout: dominant item summary, numbered identifier, quantity, and a live elapsed timer calculated from the order's saved submission time. Existing saved orders retain their assigned colors.
 
 The live header is 50 px plus the top safe-area inset. The resin stage begins below it and reserves the bottom safe area. Experimental orientation/motion code remains dormant behind `SMART_MOTION_ENABLED=false`: no listeners, permission prompts, automatic motion, or debug controls appear, including with old debug query parameters.
 

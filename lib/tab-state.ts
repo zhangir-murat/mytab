@@ -6,7 +6,7 @@ export type Order = { id:number; number:number; venue:string; items:Line[]; subt
 export type Receipt = { id:string; venue:string; closedAt:number; orders:Order[]; subtotal:number; tax:number; tip:number; total:number; paidBefore:number; charged:number; paymentMethod:string };
 export type Session = { version:2; orders:Order[]; cart:Line[]; tabId:string|null; authorizedMethod:string|null; nextId:number; nextNumber:number; receipts:Receipt[]; lastClosedId:string|null };
 export const STORAGE='tab-elsewhere-v2';
-export const COLORS:Color[]=[{name:'Orange',hex:'#ff781f',ink:'#151008'},{name:'Lime',hex:'#c0fb42',ink:'#111707'},{name:'Blue',hex:'#2464f2',ink:'#ffffff'},{name:'Yellow',hex:'#ffe447',ink:'#171504'},{name:'Pink',hex:'#ff57b1',ink:'#240818'},{name:'Cyan',hex:'#43e5ed',ink:'#072022'},{name:'Purple',hex:'#8953e7',ink:'#ffffff'}];
+export const COLORS:Color[]=[{name:'Lime',hex:'#c0fb42',ink:'#111707'},{name:'Orange',hex:'#ff781f',ink:'#151008'},{name:'Blue',hex:'#2464f2',ink:'#ffffff'},{name:'Yellow',hex:'#ffe447',ink:'#171504'},{name:'Pink',hex:'#ff57b1',ink:'#240818'},{name:'Cyan',hex:'#43e5ed',ink:'#072022'},{name:'Purple',hex:'#8953e7',ink:'#ffffff'}];
 export const fresh=():Session=>({version:2,orders:[],cart:[],tabId:null,authorizedMethod:null,nextId:47,nextNumber:47,receipts:[],lastClosedId:null});
 export const sum=(lines:Line[])=>lines.reduce((n,i)=>n+i.price*100*i.qty,0);
 export function totals(orders:Order[]){

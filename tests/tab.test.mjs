@@ -7,9 +7,9 @@ test('Authorize once, send rounds without payment, close once and retain numbere
  let s=authorize(fresh(),'Apple Pay',1);const id=s.tabId;
  assert.equal(authorize(s,'Card',2),s);
  const first=placeOrder(s,[drink],false,3);s=first.session;
- assert.equal(first.order.number,47);assert.equal(first.order.color.name,'Orange');assert.equal(first.order.paymentStatus,'on-tab');assert.equal(first.order.tip,0);
+ assert.equal(first.order.number,47);assert.equal(first.order.color.name,'Lime');assert.equal(first.order.paymentStatus,'on-tab');assert.equal(first.order.tip,0);
  const second=placeOrder(s,[{...drink,id:'martini',key:'martini',price:17,qty:1},{...drink,id:'beer',key:'beer',price:8,qty:2}],false,4);s=second.session;
- assert.notEqual(second.order.number,47);assert.notEqual(second.order.color.name,'Orange');assert.equal(second.order.tabId,id);
+ assert.notEqual(second.order.number,47);assert.notEqual(second.order.color.name,'Lime');assert.equal(second.order.tabId,id);
  assert.throws(()=>settleTab(s,0),/delivered/);
  s={...s,orders:s.orders.map(o=>({...o,status:'delivered'}))};
  assert.deepEqual(totals(s.orders),{subtotal:6500,tax:577,total:7077,paidBefore:0,legacyTips:0,tipBase:6500,due:7077});
