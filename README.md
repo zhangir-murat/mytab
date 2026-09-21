@@ -13,7 +13,7 @@ pnpm install --frozen-lockfile
 pnpm dev
 ```
 
-Open the URL printed by the server, normally http://localhost:5173. Home is at `/`; the existing Elsewhere customer and staff experience is at `/venue/elsewhere`.
+Open the URL printed by the server, normally http://localhost:5173. Home is at `/`; the shared ordering experience is at `/venue/elsewhere`, `/venue/house-of-yes`, and `/venue/babys-all-right`.
 
 ```sh
 pnpm test
@@ -25,7 +25,7 @@ The production build targets Cloudflare Workers through Vinext. `pnpm start` pre
 
 ## Try the complete flow
 
-1. From Home, search for Elsewhere, choose its Favorites or Discover shortcut, or scan an Elsewhere QR code to enter the venue. The scanner uses the browser's native QR detector where supported; a direct venue shortcut remains available if camera scanning is unavailable.
+1. From Home, search for a venue, choose its Favorites or Discover shortcut, or scan a TAB venue QR code. Elsewhere, House of Yes, and Baby's All Right use one shared ordering screen with demo menus. The scanner uses the browser's native QR detector where supported; direct venue shortcuts remain available if camera scanning is unavailable.
 2. Open a tab and authorize simulated Apple Pay, Google Pay, or a demo card. Nothing is charged.
 3. Order Spicy Margarita ×2. The first round is #47 with a fluorescent lime marker, matched in Staff Mode.
 4. Tap SHOW SERVER. The lime resin transfers to the top in 300 ms; tap BRING BACK to return it. Text fades out in transit and reappears already facing the correct edge.
@@ -47,7 +47,8 @@ The live header is 50 px plus the top safe-area inset. The resin stage begins be
 ## Scope and verification
 
 - Shared customer/staff state persists locally, including refresh and same-origin browser-tab updates. Different devices do not share orders.
-- Home lists the one available venue, Elsewhere. Friends shows an empty state because this prototype has no social connections or additional venue data.
+- Home lists three demo venues and uses their shared data for Search, Favorites, Discover, and QR navigation. Friends shows a compact empty state because this prototype has no social connections.
+- Each venue has its own persisted tab, orders, staff queue, and receipts. Re-entering a venue always opens its menu, even if its tab remains active or was previously closed; the active amount remains accessible from the menu. The original Elsewhere storage key is preserved for existing sessions.
 - No real payments or authorization, card collection, user accounts, or POS integration. Demo card fields are read-only.
 - Money uses integer cents; demo tax is 8.875% rounded on the accumulated subtotal. Tips are computed on the pre-tax subtotal. Prior v1 payments are migrated and credited, never charged again.
 - Best-effort Wake Lock keeps active markers visible when the browser allows it.
@@ -57,11 +58,13 @@ The live header is 50 px plus the top safe-area inset. The resin stage begins be
 ## Source
 
 - `app/page.tsx`: Home, venue search, QR entry, shortcuts, and history preview.
-- `app/venue/elsewhere/page.tsx`: existing customer and staff flows.
+- `app/venue/[id]/page.tsx`: venue route resolution.
+- `components/tab/venue-app.tsx`: shared customer and staff flows.
+- `lib/venues.ts`: venue metadata and demo menus.
 - `components/tab/smart-display.tsx`: sensor access, simulator, animation renderer.
 - `lib/marker-motion.ts`: shared tilt/physics engine.
 - `lib/tab-state.ts`: tab authorization, orders, closeout, history, migration.
 - `app/globals.css`: existing dark design and responsive marker layout.
 - `tests/tab.test.mjs`: state and motion regression tests.
 
-The exported hosting manifest has no existing Site project identifier. Dependencies, generated artifacts, runtime state, and credentials are excluded.
+Dependencies, generated artifacts, runtime state, and credentials are excluded.

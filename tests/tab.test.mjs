@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {fresh,authorize,placeOrder,settleTab,tipAmount,totals,restoreSession} from '../lib/tab-state.ts';
+import {fresh,authorize,placeOrder,settleTab,tipAmount,totals,restoreSession,storageKey} from '../lib/tab-state.ts';
+import {venues,venueById,venuePath} from '../lib/venues.ts';
 import {createMotionState,feedTilt,stepMotion,orientationSample,gravitySample} from '../lib/marker-motion.ts';
 const drink={id:'margarita',name:'Spicy Margarita',short:'Margarita',description:'',price:16,category:'Cocktails',qty:2,key:'margarita'};
 test('Authorize once, send rounds without payment, close once and retain numbered history',()=>{
@@ -26,6 +27,36 @@ test('Custom tips validate cents and legacy paid rounds are credited',()=>{
  const migrated=restoreSession({...s,version:undefined,receipts:undefined});
  assert.equal(totals(migrated.orders).due,0);assert.equal(settleTab(migrated,0).receipt.charged,0);
  assert.throws(()=>settleTab({...s,cart:[drink]},0),/unplaced/);
+});
+test('Each venue has its own menu, storage, orders, and receipts',()=>{
+ const ids=venues.map(venue=>venue.id);
+ assert.deepEqual(ids,['elsewhere','house-of-yes','babys-all-right']);
+ assert.equal(new Set(ids.map(storageKey)).size,3);
+ assert.equal(storageKey('elsewhere'),'tab-elsewhere-v2');
+ const saved=new Map();
+ for(const venue of venues){
+  assert.equal(venuePath(venue),`/venue/${venue.id}`);
+  const unique=venue.id==='elsewhere'?'Spicy Margarita':venue.id==='house-of-yes'?'Disco Paloma':"Baby's Espresso";
+  const item=venue.menu.find(row=>row.name===unique);
+  assert.ok(item);
+  const line={...item,qty:1,key:item.id};
+  let session=authorize(fresh(),'Apple Pay',100+ids.indexOf(venue.id));
+  const placed=placeOrder(session,[line],false,200+ids.indexOf(venue.id),venue);
+  session={...placed.session,orders:placed.session.orders.map(order=>({...order,status:'delivered'}))};
+  const closed=settleTab(session,0,300+ids.indexOf(venue.id),venue);
+  assert.equal(closed.receipt.venueId,venue.id);
+  assert.equal(closed.receipt.venue,venue.name);
+  assert.equal(placed.order.venueId,venue.id);
+  saved.set(storageKey(venue.id),JSON.stringify(closed.session));
+ }
+ for(const venue of venues){
+  const session=restoreSession(JSON.parse(saved.get(storageKey(venue.id))));
+  assert.equal(session.orders.length,1);
+  assert.equal(session.orders[0].venue,venue.name);
+  assert.equal(session.receipts[0].venueId,venue.id);
+  assert.equal(session.tabId,null);
+  assert.equal(venueById(venue.id),venue);
+ }
 });
 function settle(engine,degrees,side=1,reverse=false,start=0){let result;for(let i=0;i<240;i++){feedTilt(engine,{degrees,side,stationary:true},start+i*16.667);result=stepMotion(engine,1/60,reverse)}return result}
 test('Marker travels continuously through upright, 45°, flat, and pickup',()=>{

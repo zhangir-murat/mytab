@@ -4,8 +4,8 @@ import "./globals.css";
 export const viewport: Viewport = { width: 'device-width', initialScale: 1, viewportFit: 'cover', themeColor: '#111112' };
 
 export const metadata: Metadata = {
-  title: "TAB — Elsewhere",
-  description: "Order a round. Put your phone down. TAB brings the bar to you.",
+  title: "TAB",
+  description: "Find your bar, order a round, and let your phone guide delivery.",
   icons: {
     icon: "/favicon.svg",
     shortcut: "/favicon.svg",
