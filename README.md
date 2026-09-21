@@ -13,7 +13,7 @@ pnpm install --frozen-lockfile
 pnpm dev
 ```
 
-Open the URL printed by the server, normally http://localhost:5173.
+Open the URL printed by the server, normally http://localhost:5173. Home is at `/`; the existing Elsewhere customer and staff experience is at `/venue/elsewhere`.
 
 ```sh
 pnpm test
@@ -25,13 +25,14 @@ The production build targets Cloudflare Workers through Vinext. `pnpm start` pre
 
 ## Try the complete flow
 
-1. Open a tab and authorize simulated Apple Pay, Google Pay, or a demo card. Nothing is charged.
-2. Order Spicy Margarita ×2. The first round is #47 with a fluorescent lime marker, matched in Staff Mode.
-3. Tap SHOW SERVER. The lime resin transfers to the top in 300 ms; tap BRING BACK to return it. Text fades out in transit and reappears already facing the correct edge.
-4. Use the small controls button (bottom-left on the live marker) to switch to Staff. Start the order, mark it ready, deliver it, then mark it delivered.
-5. Return to Customer and order another round. No further authorization, payment, or tip screen appears.
-6. Open the literal TAB button and choose CLOSE MY TAB after delivery. Choose 18%, 20%, 25%, Custom, or No tip; nothing is preselected.
-7. CLOSE & PAY completes one simulated payment and saves a numbered receipt in History.
+1. From Home, search for Elsewhere, choose its Favorites or Discover shortcut, or scan an Elsewhere QR code to enter the venue. The scanner uses the browser's native QR detector where supported; a direct venue shortcut remains available if camera scanning is unavailable.
+2. Open a tab and authorize simulated Apple Pay, Google Pay, or a demo card. Nothing is charged.
+3. Order Spicy Margarita ×2. The first round is #47 with a fluorescent lime marker, matched in Staff Mode.
+4. Tap SHOW SERVER. The lime resin transfers to the top in 300 ms; tap BRING BACK to return it. Text fades out in transit and reappears already facing the correct edge.
+5. Use the small controls button (bottom-left on the live marker) to switch to Staff. Start the order, mark it ready, deliver it, then mark it delivered.
+6. Return to Customer and order another round. No further authorization, payment, or tip screen appears.
+7. Open the literal TAB button and choose CLOSE MY TAB after delivery. Choose 18%, 20%, 25%, Custom, or No tip; nothing is preselected.
+8. CLOSE & PAY completes one simulated payment and saves a numbered receipt in History. Home's History preview links to the same history view.
 
 Add to Tab assembles an unplaced round. Send Order submits its items together. Large orders are delivered in batches of up to two distinct line items so the marker stays readable.
 
@@ -46,6 +47,7 @@ The live header is 50 px plus the top safe-area inset. The resin stage begins be
 ## Scope and verification
 
 - Shared customer/staff state persists locally, including refresh and same-origin browser-tab updates. Different devices do not share orders.
+- Home lists the one available venue, Elsewhere. Friends shows an empty state because this prototype has no social connections or additional venue data.
 - No real payments or authorization, card collection, user accounts, or POS integration. Demo card fields are read-only.
 - Money uses integer cents; demo tax is 8.875% rounded on the accumulated subtotal. Tips are computed on the pre-tax subtotal. Prior v1 payments are migrated and credited, never charged again.
 - Best-effort Wake Lock keeps active markers visible when the browser allows it.
@@ -54,7 +56,8 @@ The live header is 50 px plus the top safe-area inset. The resin stage begins be
 
 ## Source
 
-- `app/page.tsx`: customer and staff flows.
+- `app/page.tsx`: Home, venue search, QR entry, shortcuts, and history preview.
+- `app/venue/elsewhere/page.tsx`: existing customer and staff flows.
 - `components/tab/smart-display.tsx`: sensor access, simulator, animation renderer.
 - `lib/marker-motion.ts`: shared tilt/physics engine.
 - `lib/tab-state.ts`: tab authorization, orders, closeout, history, migration.
